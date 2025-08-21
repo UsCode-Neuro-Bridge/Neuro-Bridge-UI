@@ -1,12 +1,24 @@
+"use client";
+
 import Header from "@/components/Header";
 import Card from "@/components/Card";
-import Link from "next/link";
 
 import old1 from "@/assets/image/old1.png";
 import old2 from "@/assets/image/old2.png";
 import old3 from "@/assets/image/old3.png";
+import { useState } from "react";
+import Modal from "@/components/Modal";
 
 export default function Home() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
   return (
     <div>
       <Header />
@@ -31,11 +43,14 @@ export default function Home() {
           />
           <Card phrase="행동분석 결과를 분석합니다." image={old3} />
         </div>
-        <div className="flex items-center justify-center mt-[50px] mb-[40px] w-[300px] md:w-[700px] h-[56px] bg-[#4E3A00] rounded-2xl">
-          <Link href="/mesurement" className="text-[#ffffff]">
-            측정 시작하기
-          </Link>
+        <div
+          className="flex items-center justify-center cursor-pointer mt-[50px] mb-[40px] w-[300px] md:w-[700px] h-[56px] bg-[#4E3A00] rounded-2xl"
+          onClick={toggleMenu}
+        >
+          <div className="text-[#ffffff]">측정 시작하기</div>
         </div>
+
+        {isOpen && <Modal closeMenu={closeMenu} />}
       </div>
     </div>
   );

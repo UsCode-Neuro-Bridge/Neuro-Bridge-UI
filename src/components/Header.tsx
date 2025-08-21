@@ -7,7 +7,7 @@ const Header = () => {
       <div>
         <Link href="/" className="flex items-center gap-2 cursor-pointer">
           <Image src="/logo.png" alt="logo-image" width={45} height={49} />
-          <div className="hidden md:block">NeuralBridge</div>
+          <div className="hidden md:block">NeuroBridge</div>
         </Link>
       </div>
       <nav className="flex gap-6 text-gray-700 font-medium">
