@@ -47,7 +47,7 @@ export default function Home() {
           className="flex items-center justify-center cursor-pointer mt-[50px] mb-[40px] w-[300px] md:w-[700px] h-[56px] bg-[#4E3A00] rounded-2xl"
           onClick={toggleMenu}
         >
-          <div className="text-[#ffffff]">측정 시작하기</div>
+          <div className="text-[#ffffff]">측정</div>
         </div>
 
         {isOpen && <Modal closeMenu={closeMenu} />}
