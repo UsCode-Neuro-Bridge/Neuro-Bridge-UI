@@ -42,6 +42,8 @@ const Measurement = () => {
   const [level, setLevel] = useState<AssessmentLevel | null>(null);
   const [summary, setSummary] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [age, setAge] = useState<number | "">("");
+  const [started, setStarted] = useState<boolean>(false);
 
   const handleComplete = useCallback(
     async (finalCount: number, durationSec?: number) => {
@@ -60,7 +62,12 @@ const Measurement = () => {
         const res = await fetch("/api/assessment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ count: finalCount, seconds: s, level: l }),
+          body: JSON.stringify({
+            count: finalCount,
+            seconds: s,
+            level: l,
+            age: typeof age === "number" ? age : null,
+          }),
         });
         if (res.ok) {
           const data = await res.json();
@@ -74,7 +81,7 @@ const Measurement = () => {
         setLoading(false);
       }
     },
-    [seconds]
+    [seconds, age]
   );
 
   const headerText = useMemo(() => {
@@ -107,8 +114,52 @@ const Measurement = () => {
         </p>
       </div>
 
-      {/* HandTracker 컴포넌트가 완료 시 (count, durationSec)를 콜백으로 넘겨준다고 가정 */}
-      <HandTracker onComplete={handleComplete} targetSeconds={seconds} />
+      {!started && count === null && (
+        <div className="max-w-md mx-auto mb-6 p-4 rounded-lg border bg-white/60">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            나이 (선택)
+          </label>
+          <input
+            type="number"
+            min={0}
+            max={120}
+            value={age === "" ? "" : age}
+            onChange={(e) => {
+              const v = e.target.value;
+              setAge(v === "" ? "" : Number(v));
+            }}
+            placeholder="예: 3 (만 3세), 35, 72"
+            className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring"
+          />
+          <p className="mt-2 text-xs text-gray-500">
+            개인화된 분석을 위해 선택적으로 입력하세요. 입력하지 않아도 측정은
+            진행됩니다.
+          </p>
+          <div className="mt-4 flex items-center gap-2">
+            <button
+              onClick={() => setStarted(true)}
+              disabled={age === ""}
+              className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              확인 후 측정 시작
+            </button>
+            {age === "" && (
+              <span className="text-xs text-gray-500">
+                나이를 입력하면 시작할 수 있어요.
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {started && count === null ? (
+        <HandTracker onComplete={handleComplete} targetSeconds={seconds} />
+      ) : !started && count === null ? (
+        <div className="max-w-2xl mx-auto text-center text-gray-500 py-10">
+          나이를 입력하고 <span className="font-medium">확인</span> 버튼을
+          누르면 측정을 시작합니다.
+        </div>
+      ) : null}
 
       {/* 결과 패널 */}
       {count !== null && (
@@ -117,7 +168,7 @@ const Measurement = () => {
             <div>
               <h2 className="text-2xl font-semibold">측정 결과</h2>
               <p className="text-sm text-gray-500 mt-1">
-                분류 기준: 60회 이상=정상, 30~59회=주의, 10회 이하=위험
+                분류 기준: 70회 이상=정상, 55~69회=주의(관심), 55회 이하=위험
               </p>
             </div>
             <button

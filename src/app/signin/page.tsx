@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useAuthStore } from "@/store/authStore";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "올바른 이메일 형식이 아닙니다." }),
@@ -60,6 +61,7 @@ export default function LoginPage() {
 
       console.log("로그인 성공:", result);
       localStorage.setItem("user-token", "로그인성공토큰");
+      useAuthStore.getState().login();
       router.push("/");
       setIsSuccess(true);
     } catch (error) {

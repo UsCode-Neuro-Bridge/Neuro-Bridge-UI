@@ -1,6 +1,5 @@
 "use client";
 
-import Header from "@/components/Header";
 import Card from "@/components/Card";
 
 import old1 from "@/assets/image/old1.png";
@@ -21,7 +20,6 @@ export default function Home() {
   };
   return (
     <div>
-      <Header />
       <section className="text-center py-16 px-4">
         <h1 className="text-4xl font-bold text-slate-800 mb-6 break-keep">
           간편한 손동작 측정으로 뇌질환 위험,

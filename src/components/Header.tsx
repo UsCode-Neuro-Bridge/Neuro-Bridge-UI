@@ -1,31 +1,27 @@
 "use client";
 
+import { useAuthStore } from "@/store/authStore";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react"; // useState, useEffect import
+import { useEffect } from "react";
 
 const Header = () => {
-  // 로그인 상태를 관리하는 state.
-  // 실제 애플리케이션에서는 이 부분을 Context, Zustand 같은 전역 상태나
-  // 쿠키, 세션 등을 확인하는 로직으로 대체해야 합니다.
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, login, logout } = useAuthStore();
 
-  // 컴포넌트가 처음 로딩될 때 로그인 상태를 확인하는 로직 (예시)
-  // 지금은 localStorage를 사용하지만, 실제로는 서버에 유효한 토큰이 있는지 확인해야 합니다.
+  // 컴포넌트가 처음 렌더링될 때 로그인 상태 초기화
   useEffect(() => {
     const token = localStorage.getItem("user-token");
     if (token) {
-      setIsLoggedIn(true);
+      login(); // ✅ store 상태 갱신
     }
-  }, []);
+  }, [login]);
 
   // 로그아웃 핸들러
   const handleLogout = () => {
-    // 실제로는 로그아웃 API 호출 및 토큰/세션 제거 로직이 필요합니다.
     localStorage.removeItem("user-token");
-    setIsLoggedIn(false);
+    logout(); // ✅ store 상태 갱신
     // 필요하다면 로그인 페이지로 이동
-    // window.location.href = '/login';
+    // router.push("/signin");
   };
 
   return (
@@ -40,13 +36,13 @@ const Header = () => {
       </div>
       <nav className="flex items-center gap-6 text-gray-700 font-medium">
         {isLoggedIn ? (
-          // ✅ 로그인 했을 때 보여줄 메뉴
+          // ✅ 로그인했을 때 메뉴
           <>
             <Link href="/" className="hover:text-blue-600 transition-colors">
               홈
             </Link>
             <Link
-              href="/mesurement" // 'mesurement' -> 'measurement' 오타 수정
+              href="/mesurement"
               className="hover:text-blue-600 transition-colors"
             >
               측정
@@ -71,7 +67,7 @@ const Header = () => {
             </button>
           </>
         ) : (
-          // ❌ 로그인 안 했을 때 보여줄 메뉴
+          // ❌ 로그인 안 했을 때 메뉴
           <>
             <Link
               href="/signin"
