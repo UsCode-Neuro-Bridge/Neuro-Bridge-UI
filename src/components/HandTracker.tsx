@@ -10,16 +10,22 @@ import {
 // '게임'의 전체 상태를 관리합니다.
 type GameState = "loading" | "countdown" | "measuring" | "finished";
 
-const HandTracker = () => {
+type Props = {
+  onComplete?: (count: number, durationSec?: number) => void;
+  targetSeconds?: number;
+};
+
+const HandTracker = ({ onComplete, targetSeconds = 30 }: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number | null>(null);
   const handLandmarkerRef = useRef<HandLandmarker | null>(null);
+  const reportedRef = useRef(false);
 
   // ------------------- 상태 관리 -------------------
   const [gameState, setGameState] = useState<GameState>("loading");
   const [countdown, setCountdown] = useState(3);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(targetSeconds);
   const [punchCount, setPunchCount] = useState(0);
   const isFistState = useRef(false); // 주먹 상태를 기억 (true: 주먹, false: 편손)
 
@@ -99,6 +105,14 @@ const HandTracker = () => {
     const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearTimeout(timer);
   }, [gameState, timeLeft]);
+
+  useEffect(() => {
+    if (gameState !== "finished") return;
+    if (reportedRef.current) return;
+    reportedRef.current = true;
+    const elapsed = Math.max(0, targetSeconds - timeLeft);
+    onComplete?.(punchCount, elapsed || targetSeconds);
+  }, [gameState, punchCount, timeLeft, targetSeconds, onComplete]);
 
   // 4. 실시간 감지 및 그리기 함수
   const predictWebcam = () => {
@@ -204,7 +218,7 @@ const HandTracker = () => {
             <div className="bg-gray-300 h-4 rounded-full overflow-hidden">
               <div
                 className="bg-green-500 h-4 transition-all duration-500"
-                style={{ width: `${(timeLeft / 30) * 100}%` }}
+                style={{ width: `${(timeLeft / targetSeconds) * 100}%` }}
               />
             </div>
           </div>
