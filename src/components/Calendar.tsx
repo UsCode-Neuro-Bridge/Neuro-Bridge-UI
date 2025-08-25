@@ -6,6 +6,13 @@ import "react-day-picker/style.css";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 import { ko } from "date-fns/locale";
 
+type CalendarProps = {
+  /** Optional extra classes to control outer spacing/placement from parent */
+  className?: string;
+  /** 캘린더 전체 크기 제어 (sm, md, lg) */
+  size?: "sm" | "md" | "lg";
+};
+
 // 서버 응답: ["2025-08-01", "2025-08-03", ...]
 async function fetchTestDates(userId: string, fromISO: string, toISO: string) {
   const url = new URL("/api/dates", window.location.origin);
@@ -18,7 +25,15 @@ async function fetchTestDates(userId: string, fromISO: string, toISO: string) {
   return Array.isArray(data) ? data : [];
 }
 
-export default function CalendarPage() {
+export default function Calendar({
+  className = "",
+  size = "md",
+}: CalendarProps) {
+  const sizeScale = {
+    sm: "scale-90",
+    md: "scale-100",
+    lg: "scale-125",
+  }[size];
   const [userId, setUserId] = useState("");
   const [month, setMonth] = useState<Date>(startOfMonth(new Date()));
   const [doneDates, setDoneDates] = useState<Date[]>([]);
@@ -74,15 +89,10 @@ export default function CalendarPage() {
   }, [userId, fromISO, toISO]);
 
   return (
-    <main className="container mx-auto p-6">
-      <div className="mb-3 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">캘린더</h1>
-        <span className="text-sm text-gray-500">
-          {loading ? "불러오는 중…" : `조회: ${fromISO} ~ ${toISO}`}
-        </span>
-      </div>
-
-      <div className="rounded-lg bg-white p-4 flex justify-center ">
+    <section
+      className={`nb-calendar not-prose text-base leading-normal text-inherit ${className}`}
+    >
+      <div className="flex justify-center">
         <DayPicker
           locale={ko}
           month={month}
@@ -92,6 +102,7 @@ export default function CalendarPage() {
           modifiersClassNames={{
             done: "done-day bg-green-100 text-green-800 font-semibold relative",
           }}
+          className={`${sizeScale} origin-top`}
         />
         <style jsx global>{`
           /* Add a check icon to days marked as done */
@@ -113,15 +124,14 @@ export default function CalendarPage() {
           <span className="inline-block h-3 w-3 rounded bg-green-100 border border-green-300" />{" "}
           테스트 완료
         </span>
-        <span className="text-gray-400 ">
-          월 이동 시 해당 범위를 자동 조회합니다.
-        </span>
       </div>
 
       <p className="mt-2 text-xs text-gray-500 flex justify-center gap-1">
         사용자 <span className="font-mono">{userId}</span>의 테스트 수행 날짜를
         표시합니다.
       </p>
-    </main>
+
+      <div></div>
+    </section>
   );
 }

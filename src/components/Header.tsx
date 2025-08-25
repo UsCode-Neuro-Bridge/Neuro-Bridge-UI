@@ -48,12 +48,6 @@ const Header = () => {
               측정
             </Link>
             <Link
-              href="/calendar"
-              className="hover:text-blue-600 transition-colors"
-            >
-              달력
-            </Link>
-            <Link
               href="/my-profile"
               className="hover:text-blue-600 transition-colors"
             >
