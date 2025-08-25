@@ -18,13 +18,6 @@ async function fetchTestDates(userId: string, fromISO: string, toISO: string) {
   return Array.isArray(data) ? data : [];
 }
 
-function toISO(d: Date) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
 export default function CalendarPage() {
   const [userId, setUserId] = useState("");
   const [month, setMonth] = useState<Date>(startOfMonth(new Date()));
@@ -97,40 +90,22 @@ export default function CalendarPage() {
           showOutsideDays
           modifiers={{ done: doneDates }}
           modifiersClassNames={{
-            done: "bg-green-100 text-green-800 font-semibold",
-          }}
-          // 날짜 셀 오른쪽 위에 체크 아이콘 표시
-          components={{
-            DayContent: ({ date, displayMonth }) => {
-              const iso = toISO(date);
-              const isInMonth = date.getMonth() === displayMonth.getMonth();
-              const isDone = doneDates.some(
-                (d) =>
-                  d.getFullYear() === date.getFullYear() &&
-                  d.getMonth() === date.getMonth() &&
-                  d.getDate() === date.getDate()
-              );
-              return (
-                <div
-                  className={`relative w-full h-full ${
-                    isInMonth ? "" : "text-gray-400"
-                  }`}
-                >
-                  <span>{date.getDate()}</span>
-                  {isDone && (
-                    <span
-                      className="absolute right-1 top-1 text-green-600"
-                      aria-label="테스트 완료"
-                      title="테스트 완료"
-                    >
-                      ✔️
-                    </span>
-                  )}
-                </div>
-              );
-            },
+            done: "done-day bg-green-100 text-green-800 font-semibold relative",
           }}
         />
+        <style jsx global>{`
+          /* Add a check icon to days marked as done */
+          .rdp-day.done-day::after {
+            content: "✔️";
+            position: absolute;
+            right: 0.25rem; /* ~4px */
+            top: 0.25rem; /* ~4px */
+            font-size: 0.75rem; /* text-sm */
+            line-height: 1;
+            color: #16a34a; /* tailwind green-600 */
+            pointer-events: none;
+          }
+        `}</style>
       </div>
 
       <div className="mt-4 flex justify-center items-center gap-3 text-sm text-gray-600">
